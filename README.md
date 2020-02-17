@@ -5,7 +5,7 @@ Simply type your keyword into Alfred (default: ns) to see instant search results
 
 ## Workflow Variables
 
-- `cookie`: Needed for your Notion token. I don't know how long this until a Notion token expires but at least 5+ days, I haven't used it long enough yet to quantify how long.
+- `cookie`: Needed for your Notion token. I don't know how long until a Notion token expires but at least 5+ days, I haven't used it long enough yet to quantify how long.
 - `notionSpaceId`: Your organisation identifier. 
 
 ## Obtaining your workflow variables
