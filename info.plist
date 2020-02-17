@@ -183,7 +183,7 @@ if not itemList:
 	item["uid"] = 1
 	item["type"] = "default"
 	item["title"] = "No results - go to Notion homepage"
-	item["arg"] = "https://www.notion.so/askattest/"
+	item["arg"] = "https://www.notion.so/"
 	itemList.append(item)
 items["items"] = itemList
 items_json = json.dumps(items)
@@ -230,9 +230,24 @@ sys.stdout.write(items_json)</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Instant Notion Search.
+	<string>notion-search-alfred-workflow
+An Alfred workflow to search Notion.so with instant results
 
-Update the env variables before using.</string>
+Simply type your keyword into Alfred (default: ns) to see instant search results from Notion that mimic the Quick Find function in the Notion webapp. Selecting a search result takes you to that page in Notion in your default web browser.
+
+Workflow Variables
+cookie: Needed for your Notion token. I don't know how long until a Notion token expires but at least 5+ days, I haven't used it long enough yet to quantify how long.
+notionSpaceId: Your organisation identifier.
+Obtaining your workflow variables
+Visit the Notion webapp and use your browser developer tools to see the network requests being made when you type in anything to the quick find search bar.
+
+Here you'll see a request called 'search', check the request headers to copy the cookie value and check the request payload to copy your notionSpaceId.
+
+Download:
+https://github.com/wrjlewis/notion-search-alfred-workflow/raw/master/Notion%20Search.alfredworkflow
+
+Forum topic:
+https://www.alfredforum.com/topic/14451-notionso-instant-search-workflow/</string>
 	<key>uidata</key>
 	<dict>
 		<key>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</key>
@@ -259,8 +274,8 @@ Update the env variables before using.</string>
 	</dict>
 	<key>variablesdontexport</key>
 	<array>
-		<string>cookie</string>
 		<string>notionSpaceId</string>
+		<string>cookie</string>
 	</array>
 	<key>version</key>
 	<string>0.1</string>
