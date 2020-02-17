@@ -18,3 +18,4 @@ Here you'll see a request called 'search', check the request headers to copy the
 https://github.com/wrjlewis/notion-search-alfred-workflow/raw/master/Notion%20Search.alfredworkflow
 
 ## Forum topic:
+https://www.alfredforum.com/topic/14451-notionso-instant-search-workflow/
