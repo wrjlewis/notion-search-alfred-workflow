@@ -14,6 +14,10 @@ Visit the Notion webapp and use your browser developer tools to see the network 
 
 Here you'll see a request called 'search', check the request headers to copy the `cookie` value and check the request payload to copy your `notionSpaceId`.
 
+## Tips
+
+- If you prefer using the Mac app of Notion, just replace `https://www.notion.so` with `notion://www.notion.so/` in the workflow script.
+
 ## Download:
 https://github.com/wrjlewis/notion-search-alfred-workflow/raw/master/Notion%20Search.alfredworkflow
 
