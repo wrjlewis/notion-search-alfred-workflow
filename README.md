@@ -21,5 +21,6 @@ Here you'll see a request called 'search', check the request headers to copy the
 ## Download:
 https://github.com/wrjlewis/notion-search-alfred-workflow/raw/master/Notion%20Search.alfredworkflow
 
-## Forum topic:
+## Forum topics:
 https://www.alfredforum.com/topic/14451-notionso-instant-search-workflow/
+https://www.reddit.com/r/NotionSo/comments/f58u1y/notionso_instant_search_workflow_for_alfred/
