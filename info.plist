@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.wrjlewis.notion-search</string>
+	<key>connections</key>
+	<dict>
+		<key>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>FCE03E9D-F992-4B21-9A77-E72D5130DF80</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Will Lewis</string>
+	<key>description</key>
+	<string>Instant Notion Search</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Notion Search</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>keyword</key>
+				<string>ns</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string></string>
+				<key>script</key>
+				<string>import sys
+import json
+import httplib, urllib
+import os
+
+#config
+notionSpaceId = os.environ['notionSpaceId']
+cookie = os.environ['cookie']
+
+class Payload(object):
+     def __init__(self, j):
+         self.__dict__ = json.loads(j)
+
+class searchResult(object):
+	def __init__(self, id):
+		self._id = id
+		self._title = None
+		self._icon = None
+		self._link = None
+
+	@property
+	def id(self):
+		return self._id    
+
+	@property
+	def title(self):
+		return self._title
+
+	@title.setter
+	def title(self, value):
+		self._title = value
+
+	@property
+	def icon(self):
+		return self._icon
+
+	@icon.setter
+	def icon(self, value):
+		self._icon = value
+
+	@property
+	def link(self):
+		return self._link
+
+	@link.setter
+	def link(self, value):
+		self._link = value
+
+def buildNotionSearchQueryData( str ):
+	query = {}
+
+	query["type"] = "BlocksInSpace"
+	query["query"] = alfredQuery
+	query["spaceId"] = notionSpaceId
+	query["limit"] = 8
+	filters = {}
+	filters["isDeletedOnly"] = False
+	filters["excludeTemplates"] = False
+	filters["isNavigableOnly"] = True
+	filters["requireEditPermissions"] = False
+	ancestors = []
+	filters["ancestors"] = ancestors
+	createdBy = []
+	filters["createdBy"] = createdBy
+	editedBy = []
+	filters["editedBy"] = editedBy
+	lastEditedTime = []
+	filters["lastEditedTime"] = lastEditedTime
+	createdTime = []
+	filters["createdTime"] = createdTime
+	query["filters"] = filters
+	query["sort"] = "Relevance"
+	query["source"] = "quick_find"
+	
+	jsonData = json.dumps(query)
+	return jsonData
+
+#Get query from Alfred
+alfredQuery = "{query}"
+
+#Call Notion
+
+headers = {"Content-type": "application/json",
+           "Cookie": cookie}
+conn = httplib.HTTPSConnection("www.notion.so")
+conn.request("POST", "/api/v3/search",
+             buildNotionSearchQueryData(alfredQuery), headers)
+response = conn.getresponse()
+#print response.status, response.reason
+data = response.read()
+data = data.replace("&lt;gzkNfoUU&gt;", "")
+data = data.replace("&lt;/gzkNfoUU&gt;", "")
+
+#print data
+conn.close()
+
+#Extract search results from notion response
+searchResultList = []
+searchResults = Payload(data)
+for x in searchResults.results:
+	searchResultObject = searchResult(x.get('id'))
+	if "properties" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
+		searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('properties').get('title')[0][0]
+		if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
+			searchResultObject.icon = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format').get('page_icon')
+			searchResultObject.title = searchResultObject.icon + " " + searchResultObject.title 
+		searchResultObject.link = "https://www.notion.so/" + searchResultObject.id.replace("-", "")
+		searchResultList.append(searchResultObject)
+
+itemList = []
+for searchResultObject in searchResultList:
+	item = {}
+	item["uid"] = searchResultObject.id
+	item["type"] = "default"
+	item["title"] = searchResultObject.title
+	item["arg"] = searchResultObject.link
+	#item["autocomplete"] = searchResultObject.title
+	itemList.append(item)
+
+items = {}
+if not itemList:
+	item = {}
+	item["uid"] = 1
+	item["type"] = "default"
+	item["title"] = "No results - go to Notion homepage"
+	item["arg"] = "https://www.notion.so/askattest/"
+	itemList.append(item)
+items["items"] = itemList
+items_json = json.dumps(items)
+
+sys.stdout.write(items_json)</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>Notion Search</string>
+				<key>type</key>
+				<integer>3</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string></string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>FCE03E9D-F992-4B21-9A77-E72D5130DF80</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>Instant Notion Search.
+
+Update the env variables before using.</string>
+	<key>uidata</key>
+	<dict>
+		<key>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</key>
+		<dict>
+			<key>xpos</key>
+			<integer>50</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+		<key>FCE03E9D-F992-4B21-9A77-E72D5130DF80</key>
+		<dict>
+			<key>xpos</key>
+			<integer>255</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+	</dict>
+	<key>variables</key>
+	<dict>
+		<key>cookie</key>
+		<string></string>
+		<key>notionSpaceId</key>
+		<string></string>
+	</dict>
+	<key>variablesdontexport</key>
+	<array>
+		<string>cookie</string>
+		<string>notionSpaceId</string>
+	</array>
+	<key>version</key>
+	<string>0.1</string>
+	<key>webaddress</key>
+	<string>https://willlewis.co.uk</string>
+</dict>
+</plist>
