@@ -1,7 +1,11 @@
 # notion-search-alfred-workflow
 An Alfred workflow to search Notion.so with instant results
 
-Simply type your keyword into Alfred (default: ns) to see instant search results from Notion that mimic the Quick Find function in the Notion webapp. Selecting a search result takes you to that page in Notion in your default web browser.
+Simply type your keyword into Alfred to see instant search results from Notion that mimic the Quick Find function in the Notion webapp. Selecting a search result takes you to that page in Notion in your default web browser.
+
+## Usage
+* ns - Text Search in Notion
+* nt - Note Title Search in Notion
 
 ## Workflow Variables
 
