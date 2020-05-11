@@ -51,7 +51,7 @@ In the Alfred worfklow in the upper right corner click the `[x]` icon and add th
 - If you prefer using the Mac app of Notion, set the `useDesktopClient` environment variable in Alfred to `True`.
 
 ## Download:
-https://github.com/wrjlewis/notion-search-alfred-workflow/raw/master/Notion%20Search.alfredworkflow
+https://github.com/wrjlewis/notion-search-alfred-workflow/releases/latest/download/Notion.Search.alfredworkflow
 
 ## Forum topics:
 https://www.alfredforum.com/topic/14451-notionso-instant-search-workflow/
