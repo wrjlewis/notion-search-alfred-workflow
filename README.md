@@ -7,8 +7,9 @@ Simply type your keyword into Alfred (default: ns) to see instant search results
 
 - `cookie`: Needed for your Notion token. I don't know how long a Notion token lasts but I suspect indefinitely if you use notion regularly.
 - `notionSpaceId`: Your organisation identifier. 
-- `isNavigableOnly`: Defaults to True unless set to False. Setting to false allows you to search objects within a page, ie notion objects that cannot be found through the left hand side navigation pane.
-- `useDesktopClient`: Defaults to False unless set to True. When True, this option ensures links are opened in the desktop client rather than the web app.
+- `isNavigableOnly`: Defaults to True. Setting to false allows you to search objects within a page, ie notion objects that cannot be found through the left hand side navigation pane.
+- `useDesktopClient`: Defaults to False. Determines whether to open Notion links in the desktop client rather than the web app.
+- `enableIcons`: Defaults to True. This toggles support for Notion icons to be shown natively in Alfred search results, for a better design/UX experience. Custom Notion icons are downloaded on demand.
 
 ## Obtaining your workflow variables
 
@@ -49,6 +50,7 @@ In the Alfred worfklow in the upper right corner click the `[x]` icon and add th
 ## Tips
 
 - If you prefer using the Mac app of Notion, set the `useDesktopClient` environment variable in Alfred to `True`.
+- If you experience performance issues or slow searches, you may wish to set `enableIcons` to false. This changes the search results design so icons are in line with the title, it also disables the downloading of any Notion custom icons that you come across whilst searching.
 
 ## Download:
 https://github.com/wrjlewis/notion-search-alfred-workflow/releases/latest/download/Notion.Search.alfredworkflow
