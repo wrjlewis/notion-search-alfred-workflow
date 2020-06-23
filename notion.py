@@ -7,7 +7,6 @@ import os.path
 import struct
 import sys
 import urllib
-import requests
 
 from payload import Payload
 from searchresult import SearchResult
@@ -97,7 +96,7 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
         access_rights = 0o755
         os.mkdir(path, access_rights)
 
-    downloadurl = "https://www.notion.so/image/" \
+    downloadurl = "/image/" \
                   + urllib.quote(imageurl.encode('utf8'), safe='') \
                   + "?width=120&cache=v2"
     filetype = downloadurl[downloadurl.rfind('.'):]
@@ -106,10 +105,14 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
         filetype = filetype[:filetype.rfind('%3F')]
     filepath = "icons/" + searchresultobjectid + filetype
 
-    cookies = {"Cookie": cookie}
-    image = requests.get(downloadurl, cookies=cookies)
+    headers = {"Cookie": cookie}
+    conn = httplib.HTTPSConnection("www.notion.so")
+    conn.request("GET", downloadurl, "", headers)
+    response = conn.getresponse()
+    data = response.read()
+
     with open(filepath, 'wb') as f:
-        f.write(image.content)
+        f.write(data)
     return filepath
 
 
