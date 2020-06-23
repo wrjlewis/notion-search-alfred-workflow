@@ -135,6 +135,8 @@ Thanks!</string>
 	<dict>
 		<key>cookie</key>
 		<string></string>
+		<key>enableIcons</key>
+		<string>True</string>
 		<key>isNavigableOnly</key>
 		<string>True</string>
 		<key>notionSpaceId</key>
@@ -148,7 +150,7 @@ Thanks!</string>
 		<string>notionSpaceId</string>
 	</array>
 	<key>version</key>
-	<string>0.2</string>
+	<string>0.3</string>
 	<key>webaddress</key>
 	<string>https://willlewis.co.uk</string>
 </dict>
