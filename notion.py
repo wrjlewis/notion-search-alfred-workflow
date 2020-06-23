@@ -1,75 +1,41 @@
-import sys
+# coding=utf-8
+
+import httplib
 import json
-import httplib, urllib
 import os
+import os.path
+import struct
+import sys
+import urllib
+import requests
+
+from payload import Payload
+from searchresult import SearchResult
 
 # config
 notionSpaceId = os.environ['notionSpaceId']
 cookie = os.environ['cookie']
-# get useDesktopClient env variable and convert to boolean for use later, default to false unless specified as true
+
+# get useDesktopClient env variable and convert to boolean for use later, default to false
 useDesktopClient = os.environ['useDesktopClient']
 if (useDesktopClient == 'true') | (useDesktopClient == 'True') | (useDesktopClient == 'TRUE'):
     useDesktopClient = True
 else:
     useDesktopClient = False
-# get isNavigableOnly env variable and convert to boolean for use later, default to true unless specified as false
+
+# get isNavigableOnly env variable and convert to boolean for use later, default to true
 isNavigableOnly = os.environ['isNavigableOnly']
 if (isNavigableOnly == 'false') | (isNavigableOnly == 'False') | (isNavigableOnly == 'FALSE'):
     isNavigableOnly = False
 else:
     isNavigableOnly = True
 
-
-class Payload(object):
-    def __init__(self, j):
-        self.recordMap = None
-        self.results = None
-        self.__dict__ = json.loads(j)
-
-
-class SearchResult(object):
-    def __init__(self, id):
-        self._id = id
-        self._title = None
-        self._icon = None
-        self._link = None
-        self._subtitle = None
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def title(self):
-        return self._title
-
-    @title.setter
-    def title(self, value):
-        self._title = value
-
-    @property
-    def icon(self):
-        return self._icon
-
-    @icon.setter
-    def icon(self, value):
-        self._icon = value
-
-    @property
-    def link(self):
-        return self._link
-
-    @link.setter
-    def link(self, value):
-        self._link = value
-
-    @property
-    def subtitle(self):
-        return self._subtitle
-
-    @subtitle.setter
-    def subtitle(self, value):
-        self._subtitle = value
+# get enableIcons env variable and convert to boolean for use later, default to true
+enableIcons = os.environ['enableIcons']
+if (enableIcons == 'false') | (enableIcons == 'False') | (enableIcons == 'FALSE'):
+    enableIcons = False
+else:
+    enableIcons = True
 
 
 def buildnotionsearchquerydata():
@@ -109,6 +75,74 @@ def getnotionurl():
         return "https://www.notion.so/"
 
 
+def decodeemoji(emoji):
+    if emoji:
+        b = emoji.encode('utf_32_le')
+        count = len(b) // 4
+        # If count is over 10, we don't have an emoji
+        if count > 10:
+            return None
+        cp = struct.unpack('<%dI' % count, b)
+        hexlist = []
+        for x in cp:
+            hexlist.append(hex(x)[2:])
+        return hexlist
+    return None
+
+
+def downloadandgetfilepath(searchresultobjectid, imageurl):
+    # create icons dir if it doesn't already exist
+    if not os.path.isdir('./icons'):
+        path = "./icons"
+        access_rights = 0o755
+        os.mkdir(path, access_rights)
+
+    downloadurl = "https://www.notion.so/image/" \
+                  + urllib.quote(imageurl.encode('utf8'), safe='') \
+                  + "?width=120&cache=v2"
+    filetype = downloadurl[downloadurl.rfind('.'):]
+    filetype = filetype[:filetype.rfind('?')]
+    if '%3F' in filetype:
+        filetype = filetype[:filetype.rfind('%3F')]
+    filepath = "icons/" + searchresultobjectid + filetype
+
+    cookies = {"Cookie": cookie}
+    image = requests.get(downloadurl, cookies=cookies)
+    with open(filepath, 'wb') as f:
+        f.write(image.content)
+    return filepath
+
+
+def geticonpath(searchresultobjectid, notionicon):
+    iconpath = None
+
+    # is icon an emoji? If so, get hex values and construct the matching image file path in emojiicons/
+    hexlist = decodeemoji(notionicon)
+    if hexlist:
+        emojicodepoints = ""
+        count = 0
+        for x in hexlist:
+            count += 1
+            if count > 1:
+                emojicodepoints += "_"
+            emojicodepoints += x
+        iconpath = "emojiicons/" + emojicodepoints + ".png"
+        # check if emoji image exists - if not, remove last unicode codepoint and try again
+        if not os.path.isfile(iconpath):
+            while emojicodepoints.count("_") > 0:
+                emojicodepoints = emojicodepoints.rsplit('_', 1)[0]
+                iconpath = "emojiicons/" + emojicodepoints + ".png"
+                if os.path.isfile(iconpath):
+                    break
+
+    else:
+        # is icon a web url? If so, download it to icons/
+        if "http" in notionicon:
+            iconpath = downloadandgetfilepath(searchresultobjectid, notionicon)
+
+    return iconpath
+
+
 # Get query from Alfred
 alfredQuery = str(sys.argv[1])
 
@@ -120,12 +154,11 @@ conn = httplib.HTTPSConnection("www.notion.so")
 conn.request("POST", "/api/v3/search",
              buildnotionsearchquerydata(), headers)
 response = conn.getresponse()
-# print response.status, response.reason
+
 data = response.read()
 data = data.replace("<gzkNfoUU>", "")
 data = data.replace("</gzkNfoUU>", "")
 
-# print data
 conn.close()
 
 # Extract search results from notion response
@@ -145,9 +178,14 @@ for x in searchResults.results:
         searchResultObject.subtitle = " "
     if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
         if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
-            searchResultObject.icon = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get(
-                'format').get('page_icon')
-            searchResultObject.title = searchResultObject.icon + " " + searchResultObject.title
+            if enableIcons:
+                searchResultObject.icon = geticonpath(searchResultObject.id,
+                                                      searchResults.recordMap.get('block').get(searchResultObject.id)
+                                                      .get('value').get('format').get('page_icon'))
+            else:
+                searchResultObject.icon = None
+                searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
+                    'value').get('format').get('page_icon') + " " + searchResultObject.title
     searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
     searchResultList.append(searchResultObject)
 
@@ -159,7 +197,11 @@ for searchResultObject in searchResultList:
     item["title"] = searchResultObject.title
     item["arg"] = searchResultObject.link
     item["subtitle"] = searchResultObject.subtitle
-    # item["autocomplete"] = searchResultObject.title
+    if searchResultObject.icon:
+        icon = {}
+        icon["path"] = searchResultObject.icon
+        item["icon"] = icon
+    item["autocomplete"] = searchResultObject.title
     itemList.append(item)
 
 items = {}
