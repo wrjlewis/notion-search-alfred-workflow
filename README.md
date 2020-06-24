@@ -48,7 +48,7 @@ celcl9aa-c3l7-7504-ca19-0c985e34ll8d
 
 In the Alfred worfklow in the upper right corner click the `[x]` icon and add the values from above to the corresponding value field
 
-[![img](https://i.imgur.com/KKYa3El.jpg)](https://i.imgur.com/KKYa3El.jpg)
+[![img](https://i.imgur.com/Pe6nwey.jpg)](https://i.imgur.com/Pe6nwey.jpg)
 
 ## Tips
 
