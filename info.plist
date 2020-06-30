@@ -119,7 +119,7 @@
 				<integer>0</integer>
 				<key>script</key>
 				<string># THESE VARIABLES MUST BE SET. SEE THE ONEUPDATER README FOR AN EXPLANATION OF EACH.
-readonly remote_info_plist='https://github.com/wrjlewis/notion-search-alfred-workflow/blob/master/info.plist'
+readonly remote_info_plist='https://raw.githubusercontent.com/wrjlewis/notion-search-alfred-workflow/master/info.plist'
 readonly workflow_url='wrjlewis/notion-search-alfred-workflow'
 readonly download_type='github_release'
 readonly frequency_check='1'
