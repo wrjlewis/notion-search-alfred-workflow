@@ -7,6 +7,7 @@ import os.path
 import struct
 import sys
 import urllib
+import unicodedata
 
 from payload import Payload
 from searchresult import SearchResult
@@ -41,7 +42,7 @@ def buildnotionsearchquerydata():
     query = {}
 
     query["type"] = "BlocksInSpace"
-    query["query"] = alfredQuery
+    query["query"] = unicodeAlfredQuery
     query["spaceId"] = notionSpaceId
     query["limit"] = 9
     filters = {}
@@ -148,6 +149,7 @@ def geticonpath(searchresultobjectid, notionicon):
 
 # Get query from Alfred
 alfredQuery = str(sys.argv[1])
+unicodeAlfredQuery = unicodedata.normalize('NFC', alfredQuery.decode('utf-8', 'ignore'))
 
 # Call Notion
 
