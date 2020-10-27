@@ -22,6 +22,7 @@ Visit the Notion webapp and use your browser developer tools to see the network 
 
 Here you'll see a request called `search`, check the request headers to copy the `cookie` value and check the request payload to copy your `notionSpaceId`.
 
+Known issue: Some users have experienced issues with copying these values directly from developer tools, but have seen success by copying and pasting the values into TextEdit or a different text editor first, this probably "strips out" or removes any problematic formatting.
 
 [![img](https://i.imgur.com/ytewFzE.gif)](https://i.imgur.com/ytewFzE.gif)
 
