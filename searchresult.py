@@ -5,6 +5,7 @@ class SearchResult(object):
         self._icon = None
         self._link = None
         self._subtitle = None
+        self._type = None
 
     @property
     def id(self):
@@ -41,3 +42,11 @@ class SearchResult(object):
     @subtitle.setter
     def subtitle(self, value):
         self._subtitle = value
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value
