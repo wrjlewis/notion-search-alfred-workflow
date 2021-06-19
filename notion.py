@@ -75,6 +75,29 @@ def getnotionurl():
         return "https://www.notion.so/"
 
 
+def getnotionpath(searchResult, block):
+    """
+        This function Recursively looking for parent_id, parent_type until parent_type is page, so that resource like
+        toggle, code, etc can be directly access by notion within parent page.
+    :return: parent_id#target_id (if they are same, is equals to "target_id")
+    """
+
+    currentId = searchResult.id
+    currentType = searchResult.type
+
+    while currentType != "page":
+        currentId, currentType = getparentidandtype(block, currentId)
+    return currentId.replace('-', '') + "#" + searchResult.id.replace('-', '')
+
+
+def getparentidandtype(block, id):
+    value = block.get(id).get("value")
+    parent_id = value.get("parent_id")
+    parent_type = block.get(parent_id).get("value").get("type")
+
+    return parent_id, parent_type
+
+
 def decodeemoji(emoji):
     if emoji:
         b = emoji.encode('utf_32_le')
@@ -177,10 +200,9 @@ for x in searchResults.results:
                 0][0]
     else:
         searchResultObject.title = x.get('highlight').get('text')
-    if "pathText" in x.get('highlight'):
-        searchResultObject.subtitle = x.get('highlight').get('pathText')
-    else:
-        searchResultObject.subtitle = " "
+
+    searchResultObject.subtitle = x.get('highlight', {}).get('pathText', " ")
+
     if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
         if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
             if enableIcons:
@@ -191,7 +213,14 @@ for x in searchResults.results:
                 searchResultObject.icon = None
                 searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
                     'value').get('format').get('page_icon') + " " + searchResultObject.title
-    searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
+
+    searchResultObject.type = searchResults.recordMap.get('block') \
+        .get(searchResultObject.id) \
+        .get('value') \
+        .get("type", " ")
+
+    searchResultObject.link = getnotionurl() + getnotionpath(searchResultObject, searchResults.recordMap.get('block'))
+
     searchResultList.append(searchResultObject)
 
 itemList = []
