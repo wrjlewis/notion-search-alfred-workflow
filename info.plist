@@ -54,7 +54,7 @@
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
-				<integer>0</integer>
+				<integer>1</integer>
 				<key>escaping</key>
 				<integer>68</integer>
 				<key>keyword</key>
@@ -68,9 +68,9 @@
 				<key>queuemode</key>
 				<integer>1</integer>
 				<key>runningsubtext</key>
-				<string></string>
+				<string>Loading..</string>
 				<key>script</key>
-				<string>PYTHONIOENCODING=UTF-8 python notion.py "{query}"</string>
+				<string>python3 notion.py "{query}"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -262,7 +262,7 @@ Thanks!</string>
 		<string>notionSpaceId</string>
 	</array>
 	<key>version</key>
-	<string>0.3.3</string>
+	<string>0.4.0</string>
 	<key>webaddress</key>
 	<string>https://willlewis.co.uk</string>
 </dict>
