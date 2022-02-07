@@ -1,13 +1,12 @@
-# coding=utf-8
-
-import httplib
+import http.client
 import json
 import os
 import os.path
 import struct
 import sys
-import urllib
-import unicodedata
+import urllib.parse, urllib.error
+from urllib.request import Request, urlopen
+from http.cookies import SimpleCookie
 
 from payload import Payload
 from searchresult import SearchResult
@@ -15,6 +14,15 @@ from searchresult import SearchResult
 # config
 notionSpaceId = os.environ['notionSpaceId']
 cookie = os.environ['cookie']
+
+# convert cookie string to dict for later use
+bakedCookie = SimpleCookie()
+bakedCookie.load(cookie)
+# even though SimpleCookie is dictionary-like, it internally uses a Morsel object
+# Manually construct a dictionary instead.
+bakedCookies = {}
+for key, morsel in bakedCookie.items():
+    bakedCookies[key] = morsel.value
 
 # get useDesktopClient env variable and convert to boolean for use later, default to false
 useDesktopClient = os.environ['useDesktopClient']
@@ -42,7 +50,7 @@ def buildnotionsearchquerydata():
     query = {}
 
     query["type"] = "BlocksInSpace"
-    query["query"] = unicodeAlfredQuery
+    query["query"] = alfredQuery
     query["spaceId"] = notionSpaceId
     query["limit"] = 9
     filters = {}
@@ -67,13 +75,21 @@ def buildnotionsearchquerydata():
     jsonData = json.dumps(query)
     return jsonData
 
+def buildnotionrecentpagevisitsquery(userId):
+    query = {}
+
+    query["userId"] = userId
+    query["spaceId"] = notionSpaceId
+    query["limit"] = 9
+
+    jsonData = json.dumps(query)
+    return jsonData
 
 def getnotionurl():
     if useDesktopClient:
         return "notion://www.notion.so/"
     else:
         return "https://www.notion.so/"
-
 
 def decodeemoji(emoji):
     if emoji:
@@ -97,9 +113,16 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
         access_rights = 0o755
         os.mkdir(path, access_rights)
 
-    downloadurl = "/image/" \
-                  + urllib.quote(imageurl.encode('utf8'), safe='') \
-                  + "?width=120&cache=v2"
+    # has a full icon url been provided, if not construct it
+    if "https://www.notion.so" in imageurl:
+        downloadurl = imageurl.split("https://www.notion.so",1)[1]
+    else:
+        downloadurl = "/image/" \
+                    + urllib.parse.quote(imageurl.encode('utf8'), safe='') \
+                    + "?table=block&id=" \
+                    + searchresultobjectid \
+                    + "&width=120&cache=v2"
+
     filetype = downloadurl[downloadurl.rfind('.'):]
     filetype = filetype[:filetype.rfind('?')]
     if '%3F' in filetype:
@@ -107,7 +130,7 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
     filepath = "icons/" + searchresultobjectid + filetype
 
     headers = {"Cookie": cookie}
-    conn = httplib.HTTPSConnection("www.notion.so")
+    conn = http.client.HTTPSConnection("www.notion.so")
     conn.request("GET", downloadurl, "", headers)
     response = conn.getresponse()
     data = response.read()
@@ -146,58 +169,90 @@ def geticonpath(searchresultobjectid, notionicon):
 
     return iconpath
 
-
 # Get query from Alfred
 alfredQuery = str(sys.argv[1])
-unicodeAlfredQuery = unicodedata.normalize('NFC', alfredQuery.decode('utf-8', 'ignore'))
 
-# Call Notion
-
-headers = {"Content-type": "application/json",
-           "Cookie": cookie}
-conn = httplib.HTTPSConnection("www.notion.so")
-conn.request("POST", "/api/v3/search",
-             buildnotionsearchquerydata(), headers)
-response = conn.getresponse()
-
-data = response.read()
-data = data.replace("<gzkNfoUU>", "")
-data = data.replace("</gzkNfoUU>", "")
-
-conn.close()
-
-# Extract search results from notion response
 searchResultList = []
-searchResults = Payload(data)
-for x in searchResults.results:
-    searchResultObject = SearchResult(x.get('id'))
-    if "properties" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
-        searchResultObject.title = \
-            searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('properties').get('title')[
-                0][0]
-    else:
-        searchResultObject.title = x.get('highlight').get('text')
-    if "pathText" in x.get('highlight'):
-        searchResultObject.subtitle = x.get('highlight').get('pathText')
-    else:
+# If no query is provided and we're able to get the userId from the cookie env variable, show recently viewed notion pages.
+# Else show notion search results for the query given
+if not (alfredQuery and alfredQuery.strip()) and "notion_user_id" in bakedCookies:
+
+    headers = {"Content-type": "application/json",
+            "Cookie": cookie}
+    conn = http.client.HTTPSConnection("www.notion.so")
+    conn.request("POST", "/api/v3/getRecentPageVisits",
+                buildnotionrecentpagevisitsquery(bakedCookies.get("notion_user_id")), headers)
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
+
+    # Extract search results from notion recent page visits response
+    searchResults = Payload(data)
+    for x in searchResults.pages:
+        searchResultObject = SearchResult(x.get('id'))
+        searchResultObject.title = x.get('name')
         searchResultObject.subtitle = " "
-    if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
-        if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
-            if enableIcons:
-                searchResultObject.icon = geticonpath(searchResultObject.id,
-                                                      searchResults.recordMap.get('block').get(searchResultObject.id)
-                                                      .get('value').get('format').get('page_icon'))
+        searchResultObject.icon = None
+        if enableIcons:
+            #check if there is an icon emoji or a fullIconUrl for the search result
+            if "iconEmoji" in x:
+                searchResultObject.icon = geticonpath(searchResultObject.id, x.get('iconEmoji'))
+            if "fullIconUrl" in x:
+                searchResultObject.icon = geticonpath(searchResultObject.id, x.get('fullIconUrl'))            
+        
+        searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
+        searchResultList.append(searchResultObject)
+else:
+    headers = {"Content-type": "application/json",
+           "Cookie": cookie}
+    conn = http.client.HTTPSConnection("www.notion.so")
+    conn.request("POST", "/api/v3/search",
+                buildnotionsearchquerydata(), headers)
+    response = conn.getresponse()
+    data = response.read()
+
+    #Convert to string and replace
+    data = data.decode("utf-8")
+    dataStr = json.dumps(data).replace("<gzkNfoUU>", "")
+    dataStr = dataStr.replace("</gzkNfoUU>", "")
+    #Get obj back with replacement
+    data = json.loads(dataStr)   
+    conn.close()
+
+    # Extract search results from notion search response
+    searchResults = Payload(data)
+    try:
+        for x in searchResults.results:
+            searchResultObject = SearchResult(x.get('id'))
+            if "collection_id" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
+                collection_id = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('collection_id')
+                searchResultObject.title = searchResults.recordMap.get('collection').get(collection_id).get('value').get('name')[0][0]
             else:
-                searchResultObject.icon = None
-                searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
-                    'value').get('format').get('page_icon') + " " + searchResultObject.title
-    searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
-    searchResultList.append(searchResultObject)
+                if "properties" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
+                    searchResultObject.title = \
+                        searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('properties').get('title')[0][0]
+                else:
+                    searchResultObject.title = x.get('highlight').get('text')
+            searchResultObject.subtitle = x.get('highlight', {}).get('pathText', " ")
+            if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
+                if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
+                    if enableIcons:
+                        searchResultObject.icon = geticonpath(searchResultObject.id,
+                                                            searchResults.recordMap.get('block').get(searchResultObject.id)
+                                                            .get('value').get('format').get('page_icon'))
+                    else:
+                        searchResultObject.icon = None
+                        searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
+                            'value').get('format').get('page_icon') + " " + searchResultObject.title
+            
+            searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
+            searchResultList.append(searchResultObject)
+    except:
+        pass
 
 itemList = []
 for searchResultObject in searchResultList:
     item = {}
-    item["uid"] = searchResultObject.id
     item["type"] = "default"
     item["title"] = searchResultObject.title
     item["arg"] = searchResultObject.link
@@ -214,10 +269,9 @@ if not itemList:
     item = {}
     item["uid"] = 1
     item["type"] = "default"
-    item["title"] = "No results - go to Notion homepage"
+    item["title"] = "No results or error - go to Notion homepage"
     item["arg"] = getnotionurl()
     itemList.append(item)
 items["items"] = itemList
 items_json = json.dumps(items)
-
 sys.stdout.write(items_json)
