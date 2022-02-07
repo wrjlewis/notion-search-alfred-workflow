@@ -3,8 +3,9 @@ An Alfred workflow to search Notion.so with instant results
 
 Simply type your keyword into Alfred (default: ns) to see instant search results from Notion that mimic the Quick Find function in the Notion webapp. Selecting a search result takes you to that page in Notion in your default web browser.
 
-** Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates **
+Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates.
 
+Includes the ability to quickly see your recently viewed pages which are shown when triggering the workflow. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed
 
 ![img](https://github.com/wrjlewis/notion-search-alfred-workflow/blob/31d36ee9e75c343045f2a1f313b03373669a7730/notion-demo.gif)
 
@@ -31,7 +32,7 @@ Known issue: Some users have experienced issues with copying these values direct
 They should look something like this 
 
 ```
-notion_browser_id=1bcfbfb9-e98c-9f03-bfbe-e6f622e98721; logglytrbckingsession=eb1c82cb-fd88-9760-831f-bcc2b1fce01e; bjs_bnonymous_id=%22bdbf1088-b33c-9bdb-b67c-1e2cbbde11eb%22; _fbp=fb.1.1282102012213.1311670027; intercom-id-gpfdrxfd=b61ec62d-2b20-9c9d-8b12-b12736bb8f21; token_v2=b39099...
+notion_browser_id=1bcfbfb9-e98c-9f03; logglytrbckingsession=eb1c82cb-fd; bjs_bnonymous_id=%22bdbf1088-b33c-9bdb-b67c-1e; _fbp=fb.1.12821; intercom-id-gpfdrxfd=b61ec62d-; token_v2=b39099...
 
 ```
 
@@ -52,6 +53,8 @@ celcl9aa-c3l7-7504-ca19-0c985e34ll8d
 In the Alfred worfklow in the upper right corner click the `[x]` icon and add the values from above to the corresponding value field
 
 [![img](https://i.imgur.com/Pe6nwey.jpg)](https://i.imgur.com/Pe6nwey.jpg)
+
+I recommend using chrome to retrieve these values. If you can only use safari you can copy the 'token_v2' value by following the equivalent steps above and populating the cookie env variable in Alfred so it looks like this `token_v2=XXXXXXXXXXXX`.
 
 ## Tips
 
