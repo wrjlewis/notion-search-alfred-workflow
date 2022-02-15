@@ -253,6 +253,8 @@ Thanks!</string>
 		<string>True</string>
 		<key>notionSpaceId</key>
 		<string></string>
+		<key>showRecentlyViewedPages</key>
+		<string>True</string>
 		<key>useDesktopClient</key>
 		<string>False</string>
 	</dict>
@@ -262,7 +264,7 @@ Thanks!</string>
 		<string>notionSpaceId</string>
 	</array>
 	<key>version</key>
-	<string>0.4.0</string>
+	<string>0.4.1</string>
 	<key>webaddress</key>
 	<string>https://willlewis.co.uk</string>
 </dict>
