@@ -45,6 +45,13 @@ if (enableIcons == 'false') | (enableIcons == 'False') | (enableIcons == 'FALSE'
 else:
     enableIcons = True
 
+# get showRecentlyViewedPages env variable and convert to boolean for use later, default to true
+showRecentlyViewedPages = os.environ['showRecentlyViewedPages']
+if (showRecentlyViewedPages == 'false') | (showRecentlyViewedPages == 'False') | (showRecentlyViewedPages == 'FALSE'):
+    showRecentlyViewedPages = False
+else:
+    showRecentlyViewedPages = True
+
 
 def buildnotionsearchquerydata():
     query = {}
@@ -175,33 +182,33 @@ alfredQuery = str(sys.argv[1])
 searchResultList = []
 # If no query is provided and we're able to get the userId from the cookie env variable, show recently viewed notion pages.
 # Else show notion search results for the query given
-if not (alfredQuery and alfredQuery.strip()) and "notion_user_id" in bakedCookies:
+if not (alfredQuery and alfredQuery.strip()): 
+    if ("notion_user_id" in bakedCookies and showRecentlyViewedPages):
+        headers = {"Content-type": "application/json",
+                "Cookie": cookie}
+        conn = http.client.HTTPSConnection("www.notion.so")
+        conn.request("POST", "/api/v3/getRecentPageVisits",
+                    buildnotionrecentpagevisitsquery(bakedCookies.get("notion_user_id")), headers)
+        response = conn.getresponse()
+        data = response.read()
+        conn.close()
 
-    headers = {"Content-type": "application/json",
-            "Cookie": cookie}
-    conn = http.client.HTTPSConnection("www.notion.so")
-    conn.request("POST", "/api/v3/getRecentPageVisits",
-                buildnotionrecentpagevisitsquery(bakedCookies.get("notion_user_id")), headers)
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-
-    # Extract search results from notion recent page visits response
-    searchResults = Payload(data)
-    for x in searchResults.pages:
-        searchResultObject = SearchResult(x.get('id'))
-        searchResultObject.title = x.get('name')
-        searchResultObject.subtitle = " "
-        searchResultObject.icon = None
-        if enableIcons:
-            #check if there is an icon emoji or a fullIconUrl for the search result
-            if "iconEmoji" in x:
-                searchResultObject.icon = geticonpath(searchResultObject.id, x.get('iconEmoji'))
-            if "fullIconUrl" in x:
-                searchResultObject.icon = geticonpath(searchResultObject.id, x.get('fullIconUrl'))            
-        
-        searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
-        searchResultList.append(searchResultObject)
+        # Extract search results from notion recent page visits response
+        searchResults = Payload(data)
+        for x in searchResults.pages:
+            searchResultObject = SearchResult(x.get('id'))
+            searchResultObject.title = x.get('name')
+            searchResultObject.subtitle = " "
+            searchResultObject.icon = None
+            if enableIcons:
+                #check if there is an icon emoji or a fullIconUrl for the search result
+                if "iconEmoji" in x:
+                    searchResultObject.icon = geticonpath(searchResultObject.id, x.get('iconEmoji'))
+                if "fullIconUrl" in x:
+                    searchResultObject.icon = geticonpath(searchResultObject.id, x.get('fullIconUrl'))            
+            
+            searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
+            searchResultList.append(searchResultObject)
 else:
     headers = {"Content-type": "application/json",
            "Cookie": cookie}
@@ -269,7 +276,7 @@ if not itemList:
     item = {}
     item["uid"] = 1
     item["type"] = "default"
-    item["title"] = "No results or error - go to Notion homepage"
+    item["title"] = "Open Notion - No results, empty query, or error"
     item["arg"] = getnotionurl()
     itemList.append(item)
 items["items"] = itemList
