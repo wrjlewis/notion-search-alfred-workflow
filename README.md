@@ -5,7 +5,7 @@ Simply type your keyword into Alfred (default: ns) to see instant search results
 
 Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates.
 
-Includes the ability to quickly see your recently viewed pages which are shown when triggering the workflow. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed. There is toggle eng variable for this if you'd like to turn this off (detailed below).
+Includes the ability to quickly see your recently viewed pages which are shown when triggering the workflow. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed. There is env variable to toggle this feature if you'd like to turn this off (detailed below).
 
 ![img](https://github.com/wrjlewis/notion-search-alfred-workflow/blob/31d36ee9e75c343045f2a1f313b03373669a7730/notion-demo.gif)
 
