@@ -20,6 +20,8 @@ Includes the ability to quickly see your recently viewed pages which are shown w
 
 ## Obtaining your workflow variables
 
+> **Note**: Using the webapp is important, the Mac OS app for example will hide the cookies.
+
 Visit the Notion webapp and use your browser developer tools to see the network requests being made when you type in anything to the quick find search bar. 
 
 Here you'll see a request called `search`, check the request headers to copy the `cookie` value and check the request payload to copy your `notionSpaceId`.
