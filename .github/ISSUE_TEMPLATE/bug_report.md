@@ -7,6 +7,9 @@ assignees: ''
 
 ---
 
+**Before reporting the issue, did you ?**
+- [ ] Update your `notionSpaceId` and `cookie` value in Alfred Settings. If you don't know how to do this, [check this](https://github.com/wrjlewis/notion-search-alfred-workflow#workflow-variables)
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
