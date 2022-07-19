@@ -24,33 +24,11 @@ bakedCookies = {}
 for key, morsel in bakedCookie.items():
     bakedCookies[key] = morsel.value
 
-# get useDesktopClient env variable and convert to boolean for use later, default to false
-useDesktopClient = os.environ['useDesktopClient']
-if (useDesktopClient == 'true') | (useDesktopClient == 'True') | (useDesktopClient == 'TRUE'):
-    useDesktopClient = True
-else:
-    useDesktopClient = False
-
-# get isNavigableOnly env variable and convert to boolean for use later, default to true
-isNavigableOnly = os.environ['isNavigableOnly']
-if (isNavigableOnly == 'false') | (isNavigableOnly == 'False') | (isNavigableOnly == 'FALSE'):
-    isNavigableOnly = False
-else:
-    isNavigableOnly = True
-
-# get enableIcons env variable and convert to boolean for use later, default to true
-enableIcons = os.environ['enableIcons']
-if (enableIcons == 'false') | (enableIcons == 'False') | (enableIcons == 'FALSE'):
-    enableIcons = False
-else:
-    enableIcons = True
-
-# get showRecentlyViewedPages env variable and convert to boolean for use later, default to true
-showRecentlyViewedPages = os.environ['showRecentlyViewedPages']
-if (showRecentlyViewedPages == 'false') | (showRecentlyViewedPages == 'False') | (showRecentlyViewedPages == 'FALSE'):
-    showRecentlyViewedPages = False
-else:
-    showRecentlyViewedPages = True
+# get togglable env variables and convert to boolean for later use
+useDesktopClient = os.environ['useDesktopClient'] == "1"
+isNavigableOnly = os.environ['isNavigableOnly'] == "1"
+enableIcons = os.environ['enableIcons'] == "1"
+showRecentlyViewedPages = os.environ['showRecentlyViewedPages'] == "1"
 
 
 def buildnotionsearchquerydata():
@@ -182,7 +160,7 @@ alfredQuery = str(sys.argv[1])
 searchResultList = []
 # If no query is provided and we're able to get the userId from the cookie env variable, show recently viewed notion pages.
 # Else show notion search results for the query given
-if not (alfredQuery and alfredQuery.strip()): 
+if not (alfredQuery and alfredQuery.strip()):
     if ("notion_user_id" in bakedCookies and showRecentlyViewedPages):
         headers = {"Content-type": "application/json",
                 "Cookie": cookie}
@@ -205,8 +183,8 @@ if not (alfredQuery and alfredQuery.strip()):
                 if "iconEmoji" in x:
                     searchResultObject.icon = geticonpath(searchResultObject.id, x.get('iconEmoji'))
                 if "fullIconUrl" in x:
-                    searchResultObject.icon = geticonpath(searchResultObject.id, x.get('fullIconUrl'))            
-            
+                    searchResultObject.icon = geticonpath(searchResultObject.id, x.get('fullIconUrl'))
+
             searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
             searchResultList.append(searchResultObject)
 else:
@@ -223,7 +201,7 @@ else:
     dataStr = json.dumps(data).replace("<gzkNfoUU>", "")
     dataStr = dataStr.replace("</gzkNfoUU>", "")
     #Get obj back with replacement
-    data = json.loads(dataStr)   
+    data = json.loads(dataStr)
     conn.close()
 
     # Extract search results from notion search response
@@ -251,7 +229,7 @@ else:
                         searchResultObject.icon = None
                         searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
                             'value').get('format').get('page_icon') + " " + searchResultObject.title
-            
+
             searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
             searchResultList.append(searchResultObject)
     except:
