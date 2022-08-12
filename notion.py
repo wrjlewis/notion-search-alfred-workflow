@@ -64,6 +64,7 @@ def buildnotionsearchquerydata():
     filters["isDeletedOnly"] = False
     filters["excludeTemplates"] = False
     filters["isNavigableOnly"] = isNavigableOnly
+    filters["navigableBlockContentOnly"] = isNavigableOnly
     filters["requireEditPermissions"] = False
     ancestors = []
     filters["ancestors"] = ancestors
@@ -71,13 +72,13 @@ def buildnotionsearchquerydata():
     filters["createdBy"] = createdby
     editedby = []
     filters["editedBy"] = editedby
-    lasteditedtime = []
+    lasteditedtime = {}
     filters["lastEditedTime"] = lasteditedtime
-    createdtime = []
+    createdtime = {}
     filters["createdTime"] = createdtime
     query["filters"] = filters
     query["sort"] = "Relevance"
-    query["source"] = "quick_find"
+    query["source"] = "quick_find_input_change"
 
     jsonData = json.dumps(query)
     return jsonData
