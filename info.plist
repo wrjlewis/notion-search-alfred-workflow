@@ -250,7 +250,7 @@ Thanks!</string>
 		<key>enableIcons</key>
 		<string>True</string>
 		<key>isNavigableOnly</key>
-		<string>True</string>
+		<string>False</string>
 		<key>notionSpaceId</key>
 		<string></string>
 		<key>showRecentlyViewedPages</key>
@@ -260,11 +260,11 @@ Thanks!</string>
 	</dict>
 	<key>variablesdontexport</key>
 	<array>
-		<string>cookie</string>
 		<string>notionSpaceId</string>
+		<string>cookie</string>
 	</array>
 	<key>version</key>
-	<string>0.4.1</string>
+	<string>0.4.2</string>
 	<key>webaddress</key>
 	<string>https://willlewis.co.uk</string>
 </dict>
