@@ -13,7 +13,7 @@ Includes the ability to quickly see your recently viewed pages which are shown w
 
 - `cookie`: Needed for your Notion token. I don't know how long a Notion token lasts but I suspect indefinitely if you use notion regularly.
 - `notionSpaceId`: Your organisation identifier. 
-- `isNavigableOnly`: Defaults to True. Setting to false allows you to search objects within a page, ie notion objects that cannot be found through the left hand side navigation pane.
+- `isNavigableOnly`: Defaults to False. This settings allows you to search objects within a page, ie notion objects that cannot be found through the left hand side navigation pane. Setting to True only returns results that can be found through the left hand side navigation pane, but removes subtitles from Alred search results. 
 - `useDesktopClient`: Defaults to False. Determines whether to open Notion links in the desktop client rather than the web app.
 - `enableIcons`: Defaults to True. This toggles support for Notion icons to be shown natively in Alfred search results, for a better design/UX experience. Custom Notion icons are downloaded on demand.
 - `showRecentlyViewedPages`: Defaults to True. This toggle determines if recently viewed pages should be shown when there is no query provided by the user and the user id is present in the supplied cookie (user id is needed for the api call to show recently viewed pages).  
