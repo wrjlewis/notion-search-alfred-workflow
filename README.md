@@ -56,22 +56,22 @@ celcl9aa-c3l7-7504-ca19-0c985e34ll8d
 In the Alfred worfklow in the upper right corner click the `[x]` icon and add the values from above to the corresponding value field
 
 [![img](https://i.imgur.com/Pe6nwey.jpg)](https://i.imgur.com/Pe6nwey.jpg)
-<!-- 
-JS: Remove this because notion_user_id is actually required in the code and this won't work.
 
 I recommend using chrome to retrieve these values. If you can only use safari you can copy the 'token_v2' value by following the equivalent steps above and populating the cookie env variable in Alfred so it looks like this `token_v2=XXXXXXXXXXXX`. 
 
--->
-
 ## Troubleshooting
 
-It's possible (even likely) the script will fail due to an SSL error.  If the script isn't working, turn on debugging by clicking on the little cockroach in the alfred workflow screen.  If you see an error like:
+The script may fail due to an SSL error.  If the script isn't working, turn on debugging by clicking on the little cockroach in the alfred workflow screen.  If you see an error like:
 
 ``` [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: ..... ```
 
-Run this from the command line:
-```$ '/Applications/Python 3.9/Install Certificates.command' ```
-(Changing the version number to whatever you version number is)
+Run this from the terminal app:
+
+``` '/Applications/Python 3.9/Install Certificates.command' ```
+
+The single quotes are required.
+If this file doesn't exist, run "python --version" to find out what version you have
+and update the directory accordingly.
 
 ## Tips
 
