@@ -1,6 +1,8 @@
 # notion-search-alfred-workflow
 An Alfred workflow to search Notion.so with instant results
 
+![img](https://raw.githubusercontent.com/wrjlewis/notion-search-alfred-workflow/master/Screenshot.png)
+
 **Alfred 5 version**
 
 [Github Repository](https://github.com/wrjlewis/notion-search-alfred5-workflow)
