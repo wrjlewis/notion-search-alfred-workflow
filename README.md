@@ -39,6 +39,10 @@ Install cairosvg which will allow svg icons to be shown in Alfred search results
 
 `pip3 install cairosvg`
 
+Install cairosvgs's dependency, cairo. With [Homebrew](https://brew.sh/) for example:
+
+`brew install cairo`
+
 ### Get your workflow variables
 
 I recommend using chrome to retrieve these values. If you can only use safari you can copy the 'token_v2' value by following the equivalent steps above and populating the cookie env variable in Alfred so it looks like this `token_v2=XXXXXXXXXXXX`.
