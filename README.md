@@ -16,8 +16,8 @@ The workflow also provides the ability to quickly see your __recently viewed pag
 - `isNavigableOnly`: Defaults to False. This settings allows you to search objects within a page, ie notion objects that cannot be found through the left hand side navigation pane. Setting to True only returns results that can be found through the left hand side navigation pane, but removes subtitles from Alred search results. 
 - `useDesktopClient`: Defaults to False. Determines whether to open Notion links in the desktop client rather than the web app.
 - `enableIcons`: Defaults to True. This toggles support for Notion icons to be shown natively in Alfred search results, for a better design/UX experience. Custom Notion icons are downloaded on demand.
-- `showRecentlyViewedPages`: Defaults to True. This toggle determines if recently viewed pages should be shown when there is no query provided by the user and the user id is present in the supplied cookie (user id is needed for the api call to show recently viewed pages).  
 - `iconCacheDays`: Defaults to the recommended value of 365 days for the best performance. Defines the number of days to cache custom icons. Min 0, max 365.
+- `showRecentlyViewedPages`: Defaults to True. This toggle determines if recently viewed pages should be shown when there is no query provided by the user and the user id is present in the supplied cookie (user id is needed for the api call to show recently viewed pages).
 
 ## Install Steps
 
@@ -69,6 +69,22 @@ Download and double click the [latest release](https://github.com/wrjlewis/notio
 In the Alfred worfklow in the upper right corner click the `[x]` icon and add the values from above to the corresponding value field
 
 [![img](https://i.imgur.com/Pe6nwey.jpg)](https://i.imgur.com/Pe6nwey.jpg)
+
+I recommend using chrome to retrieve these values. If you can only use safari you can copy the 'token_v2' value by following the equivalent steps above and populating the cookie env variable in Alfred so it looks like this `token_v2=XXXXXXXXXXXX`. 
+
+## Troubleshooting
+
+The script may fail due to an SSL error.  If the script isn't working, turn on debugging by clicking on the little cockroach in the alfred workflow screen.  If you see an error like:
+
+``` [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: ..... ```
+
+Run this from the terminal app:
+
+``` '/Applications/Python 3.9/Install Certificates.command' ```
+
+The single quotes are required.
+If this file doesn't exist, run "python --version" to find out what version you have
+and update the directory accordingly.
 
 ## Tips
 
