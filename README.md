@@ -1,6 +1,18 @@
 # notion-search-alfred-workflow
 An Alfred workflow to search Notion.so with instant results
 
+**Alfred 5 version**
+
+[Github Repository](https://github.com/wrjlewis/notion-search-alfred5-workflow)
+
+[Latest Download](https://github.com/wrjlewis/notion-search-alfred5-workflow/releases/latest/download/Notion.Search.Alfred.5.alfredworkflow)
+
+**Alfred 4 version**
+
+[Github Repository](https://github.com/wrjlewis/notion-search-alfred-workflow)
+
+[Latest Download](https://github.com/wrjlewis/notion-search-alfred-workflow/releases/latest/download/Notion.Search.alfredworkflow)
+
 Simply type your keyword into Alfred (default: ns) and provide a query to see instant search results from Notion that mimic the Quick Find function in the Notion webapp. Selecting a search result takes you to that page in Notion in your default web browser or notion app.
 
 Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates.
