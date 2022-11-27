@@ -5,9 +5,17 @@ import os.path
 import struct
 import sys
 import unicodedata
+import time
 import urllib.parse, urllib.error
 from urllib.request import Request, urlopen
 from http.cookies import SimpleCookie
+
+cairosvgInstalled = False
+try:
+    from cairosvg import svg2png
+    cairosvgInstalled = True
+except: 
+    pass
 
 from payload import Payload
 from searchresult import SearchResult
@@ -45,6 +53,9 @@ if (enableIcons == 'false') | (enableIcons == 'False') | (enableIcons == 'FALSE'
     enableIcons = False
 else:
     enableIcons = True
+
+# get the number of days to cache custom icons. Min 0, max 365. Defaults to the maximum of 365 days
+iconCacheDays = sorted([0, int(os.environ['iconCacheDays']), 365])[1]
 
 # get showRecentlyViewedPages env variable and convert to boolean for use later, default to true
 showRecentlyViewedPages = os.environ['showRecentlyViewedPages']
@@ -122,9 +133,9 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
         path = "./icons"
         access_rights = 0o755
         os.mkdir(path, access_rights)
-
+    
     # has a full icon url been provided, if not construct it
-    if "https://www.notion.so" in imageurl:
+    if ("https://www.notion.so" in imageurl):
         downloadurl = imageurl.split("https://www.notion.so",1)[1]
     else:
         downloadurl = "/image/" \
@@ -132,12 +143,30 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
                     + "?table=block&id=" \
                     + searchresultobjectid \
                     + "&width=120&cache=v2"
+    
+    # construct filepath consisting of workspace id + filename 
+    filepath = downloadurl[downloadurl.rfind('%2F') + 3:]
+    filepath = filepath[:filepath.rfind('?')]
+    if '%3F' in filepath:
+        filepath = filepath[:filepath.rfind('%3F')]
+    filepath = "icons/" + searchresultobjectid + "_" + filepath
 
-    filetype = downloadurl[downloadurl.rfind('.'):]
-    filetype = filetype[:filetype.rfind('?')]
-    if '%3F' in filetype:
-        filetype = filetype[:filetype.rfind('%3F')]
-    filepath = "icons/" + searchresultobjectid + filetype
+    # figure out the filetype for later
+    filetype = filepath[filepath.rfind('.') + 1:]
+
+    # check if the file already exists and if so don't download again, according to cache settings
+    if (os.path.isfile(filepath)):
+        now = time.time()
+        timeIconModified = os.path.getmtime(filepath)
+        if ((now - timeIconModified) < (float(iconCacheDays) * 86400)):
+            # if its a svg file, return the converted png filepath instead
+            if (filetype == "svg"):
+                svgfilepath = filepath[:-3] + "png"
+                if (not os.path.isfile(svgfilepath)):
+                    # if the converted png file doesn't exist yet, create it
+                    return convertsvgtopng(filepath)
+                filepath = svgfilepath
+            return filepath
 
     headers = {"Cookie": cookie}
     conn = http.client.HTTPSConnection("www.notion.so")
@@ -147,11 +176,25 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
 
     with open(filepath, 'wb') as f:
         f.write(data)
+
+    # if svg, convert to png. Check if cariosvg is installed first
+    if (filetype == "svg"):
+        filepath = convertsvgtopng(filepath)
+
     return filepath
+
+def convertsvgtopng(filepath):
+    if (cairosvgInstalled):
+            pngfilepath = filepath[:-3] + "png"
+            svg2png(url=filepath, write_to=pngfilepath)
+            return pngfilepath
+    else:
+        return None
 
 
 def geticonpath(searchresultobjectid, notionicon):
     iconpath = None
+    svg = False
 
     # is icon an emoji? If so, get hex values and construct the matching image file path in emojiicons/
     hexlist = decodeemoji(notionicon)
@@ -170,14 +213,45 @@ def geticonpath(searchresultobjectid, notionicon):
                 emojicodepoints = emojicodepoints.rsplit('_', 1)[0]
                 iconpath = "emojiicons/" + emojicodepoints + ".png"
                 if os.path.isfile(iconpath):
-                    break
-
+                    break 
     else:
-        # is icon a web url? If so, download it to icons/
+        # is icon a web url or svg icon? If so, download it to icons/
+        if (notionicon[0:7] == "/icons/"):
+            notionicon = "https://www.notion.so/image/https%3A%2F%2Fwww.notion.so%2Ficons%2F" + notionicon[7:] + "?"
         if "http" in notionicon:
             iconpath = downloadandgetfilepath(searchresultobjectid, notionicon)
 
     return iconpath
+
+def createSubtitleChain(recordMap, id):
+    stack = []
+    parent_table = recordMap.get('block').get(id).get('value').get('parent_table')
+    id = recordMap.get('block').get(id).get('value').get('parent_id')    
+    while True:
+        if (parent_table == "block"):
+            try:
+                stack.append(recordMap.get('block').get(id).get('value').get('properties').get('title')[0][0])
+            except:
+                pass
+            parent_table = recordMap.get('block').get(id).get('value').get('parent_table')
+            id = recordMap.get('block').get(id).get('value').get('parent_id')
+        if (parent_table == "collection"):
+            try:
+                stack.append(recordMap.get('collection').get(id).get('value').get('name')[0][0])
+            except:
+                pass
+            parent_table = recordMap.get('collection').get(id).get('value').get('parent_table')
+            id = recordMap.get('collection').get(id).get('value').get('parent_id')
+        if (parent_table == "space"):
+            break
+
+    subtitle = ""
+    while (len(stack) > 0):
+        subtitle = subtitle + str(stack.pop()) + " / "
+    if (subtitle != ""):
+        subtitle = subtitle[:-2]
+
+    return subtitle
 
 # Get query from Alfred
 alfredQuery = str(sys.argv[1])
@@ -203,7 +277,7 @@ if not (alfredQuery and alfredQuery.strip()):
             for x in searchResults.pages:
                 searchResultObject = SearchResult(x.get('id'))
                 searchResultObject.title = x.get('name')
-                searchResultObject.subtitle = " "
+                searchResultObject.subtitle = createSubtitleChain(searchResults.recordMap, searchResultObject.id)
                 searchResultObject.icon = None
                 if enableIcons:
                     #check if there is an icon emoji or a fullIconUrl for the search result
@@ -214,7 +288,10 @@ if not (alfredQuery and alfredQuery.strip()):
                 
                 searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
                 searchResultList.append(searchResultObject)
-    except Exception as e: exception = e
+    except Exception as e: 
+        trace_back = sys.exc_info()[2]
+        line = trace_back.tb_lineno
+        exception = str(line) + ": " + str(e)
 else:
     try:
         headers = {"Content-type": "application/json",
@@ -246,7 +323,7 @@ else:
                         searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('properties').get('title')[0][0]
                 else:
                     searchResultObject.title = x.get('highlight').get('text')
-            searchResultObject.subtitle = x.get('highlight', {}).get('pathText', " ")
+            searchResultObject.subtitle = createSubtitleChain(searchResults.recordMap, searchResultObject.id)
             if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
                 if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
                     if enableIcons:
@@ -260,7 +337,10 @@ else:
             
             searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
             searchResultList.append(searchResultObject)
-    except Exception as e: exception = e
+    except Exception as e: 
+        trace_back = sys.exc_info()[2]
+        line = trace_back.tb_lineno
+        exception = str(line) + ": " + str(e)
 
 itemList = []
 for searchResultObject in searchResultList:
@@ -276,15 +356,25 @@ for searchResultObject in searchResultList:
     item["autocomplete"] = searchResultObject.title
     itemList.append(item)
 
-items = {}
+if exception:
+    item = {}
+    item["uid"] = 1
+    item["type"] = "default"
+    item["title"] = "There was an error:"
+    item["subtitle"] = str(exception)
+    item["arg"] = getnotionurl()
+    itemList.append(item)
+
 if not itemList:
     item = {}
     item["uid"] = 1
     item["type"] = "default"
     item["title"] = "Open Notion - No results, empty query, or error"
-    item["subtitle"] = str(exception)
+    item["subtitle"] = " "
     item["arg"] = getnotionurl()
     itemList.append(item)
+
+items = {}
 items["items"] = itemList
 items_json = json.dumps(items)
 sys.stdout.write(items_json)
