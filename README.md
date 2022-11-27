@@ -19,7 +19,7 @@ Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalva
 
 The workflow also provides the ability to quickly see your __recently viewed pages__. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed. There is and environment variable to toggle this feature if you'd like to turn this off (detailed below).
 
-![img](https://github.com/wrjlewis/notion-search-alfred-workflow/blob/main/alfred%20notion%20search.gif)
+![img](https://raw.githubusercontent.com/wrjlewis/notion-search-alfred5-workflow/main/alfred%20notion%20search.gif)
 
 ## Workflow Variables
 
