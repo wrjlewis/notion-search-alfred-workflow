@@ -227,7 +227,7 @@ def createSubtitleChain(recordMap, id):
     stack = []
     parent_table = recordMap.get('block').get(id).get('value').get('parent_table')
     id = recordMap.get('block').get(id).get('value').get('parent_id')    
-    while True:
+    for x in range(10):
         if (parent_table == "block"):
             try:
                 stack.append(recordMap.get('block').get(id).get('value').get('properties').get('title')[0][0])
