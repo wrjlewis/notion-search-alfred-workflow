@@ -276,7 +276,7 @@ Thanks!</string>
 		<string>notionSpaceId</string>
 	</array>
 	<key>version</key>
-	<string>0.5-alfred4</string>
+	<string>0.5.1-alfred4</string>
 	<key>webaddress</key>
 	<string>https://github.com/wrjlewis/notion-search-alfred-workflow/</string>
 </dict>
