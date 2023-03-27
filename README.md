@@ -96,7 +96,7 @@ The script may fail due to an SSL error.  If the script isn't working, turn on d
 
 Run this from the terminal app:
 
-``` '/Applications/Python 3.9/Install Certificates.command' ```
+``` sudo '/Applications/Python 3.9/Install Certificates.command' ```
 
 The single quotes are required.
 If this file doesn't exist, run "python --version" to find out what version you have
