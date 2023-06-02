@@ -7,6 +7,7 @@ import sys
 import unicodedata
 import time
 import urllib.parse, urllib.error
+import re
 from urllib.request import Request, urlopen
 from http.cookies import SimpleCookie
 
@@ -24,14 +25,12 @@ from searchresult import SearchResult
 notionSpaceId = os.environ['notionSpaceId']
 cookie = os.environ['cookie']
 
-# convert cookie string to dict for later use
-bakedCookie = SimpleCookie()
-bakedCookie.load(cookie)
-# even though SimpleCookie is dictionary-like, it internally uses a Morsel object
-# Manually construct a dictionary instead.
-bakedCookies = {}
-for key, morsel in bakedCookie.items():
-    bakedCookies[key] = morsel.value
+# try to get notion_user_id from cookie
+notion_user_id = None
+try:
+    notion_user_id = re.search('notion_user_id=(.[^;]+);', cookie).group(1)
+except:
+    pass
 
 # get useDesktopClient env variable and convert to boolean for use later, default to false
 useDesktopClient = os.environ['useDesktopClient']
@@ -144,9 +143,17 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
                     + searchresultobjectid \
                     + "&width=120&cache=v2"
     
-    # construct filepath consisting of workspace id + filename 
-    filepath = downloadurl[downloadurl.rfind('%2F') + 3:]
-    filepath = filepath[:filepath.rfind('?')]
+    # construct filepath consisting of workspace id + filename
+    # Notion uses many different image url types, some encoded some not
+    # hence the catasprophe here extracting a filename
+    # should probably try to normalise all urls and extract filename with one method
+    if downloadurl.rfind('%2F') < 0:
+        extractfromdownloadurl = urllib.parse.quote(downloadurl.encode('utf8'), safe='')
+    else:
+        extractfromdownloadurl = downloadurl
+    filepath = extractfromdownloadurl[extractfromdownloadurl.rfind('%2F') + 3:]
+    if '?' in filepath:
+        filepath = filepath[:filepath.rfind('?')]
     if '%3F' in filepath:
         filepath = filepath[:filepath.rfind('%3F')]
     filepath = "icons/" + searchresultobjectid + "_" + filepath
@@ -186,7 +193,7 @@ def downloadandgetfilepath(searchresultobjectid, imageurl):
 def convertsvgtopng(filepath):
     if (cairosvgInstalled):
             pngfilepath = filepath[:-3] + "png"
-            svg2png(url=filepath, write_to=pngfilepath)
+            svg2png(url=filepath, write_to=pngfilepath, output_width=200, output_height=200)
             return pngfilepath
     else:
         return None
@@ -218,8 +225,9 @@ def geticonpath(searchresultobjectid, notionicon):
         # is icon a web url or svg icon? If so, download it to icons/
         if (notionicon[0:7] == "/icons/"):
             notionicon = "https://www.notion.so/image/https%3A%2F%2Fwww.notion.so%2Ficons%2F" + notionicon[7:] + "?"
-        if "http" in notionicon:
-            iconpath = downloadandgetfilepath(searchresultobjectid, notionicon)
+        if (notionicon[0:8] == "/images/"):
+            notionicon = "https://www.notion.so" + notionicon
+        iconpath = downloadandgetfilepath(searchresultobjectid, notionicon)
 
     return iconpath
 
@@ -262,12 +270,12 @@ searchResultList = []
 # Else show notion search results for the query given
 if not (alfredQuery and alfredQuery.strip()): 
     try:
-        if ("notion_user_id" in bakedCookies and showRecentlyViewedPages):
+        if (notion_user_id is not None and showRecentlyViewedPages):
             headers = {"Content-type": "application/json",
                     "Cookie": cookie}
             conn = http.client.HTTPSConnection("www.notion.so")
             conn.request("POST", "/api/v3/getRecentPageVisits",
-                        buildnotionrecentpagevisitsquery(bakedCookies.get("notion_user_id")), headers)
+                        buildnotionrecentpagevisitsquery(notion_user_id), headers)
             response = conn.getresponse()
             data = response.read()
             conn.close()
@@ -325,16 +333,19 @@ else:
                     searchResultObject.title = x.get('highlight').get('text')
             searchResultObject.subtitle = createSubtitleChain(searchResults.recordMap, searchResultObject.id)
             if "format" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value'):
-                if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
-                    if enableIcons:
+                if enableIcons:
+                    if "page_icon" in searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format'):
                         searchResultObject.icon = geticonpath(searchResultObject.id,
                                                             searchResults.recordMap.get('block').get(searchResultObject.id)
                                                             .get('value').get('format').get('page_icon'))
                     else:
-                        searchResultObject.icon = None
-                        searchResultObject.title = searchResults.recordMap.get('block').get(searchResultObject.id).get(
-                            'value').get('format').get('page_icon') + " " + searchResultObject.title
-            
+                        if searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('type') == "collection_view":
+                            collectionPointerId = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format').get('collection_pointer').get('id')
+                            searchResultObject.icon = geticonpath(searchResultObject.id, searchResults.recordMap.get('collection').get(collectionPointerId).get('value').get('icon'))
+                else:
+                    searchResultObject.icon = None
+                    searchResultObject.title = searchResultObject.title
+
             searchResultObject.link = getnotionurl() + searchResultObject.id.replace("-", "")
             searchResultList.append(searchResultObject)
     except Exception as e: 
