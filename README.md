@@ -7,7 +7,7 @@ An Alfred workflow to search Notion.so with instant results
 
 [Github Repository](https://github.com/wrjlewis/notion-search-alfred5-workflow)
 
-[Latest Download](https://github.com/wrjlewis/notion-search-alfred5-workflow/releases/latest/download/Notion.Search.Alfred.5.alfredworkflow)
+[Latest Download](https://github.com/wrjlewis/notion-search-alfred5-workflow/releases/latest/download/Notion.Search.alfredworkflow)
 
 **Alfred 4 version**
 
