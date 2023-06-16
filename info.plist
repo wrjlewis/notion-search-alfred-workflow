@@ -4,8 +4,6 @@
 <dict>
 	<key>bundleid</key>
 	<string>com.wrjlewis.notion-search</string>
-	<key>category</key>
-	<string>Productivity</string>
 	<key>connections</key>
 	<dict>
 		<key>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</key>
@@ -242,7 +240,7 @@ fi</string>
 
 Alfred 5 download now available here:
 
-https://github.com/wrjlewis/notion-search-alfred5-workflow/releases/latest/download/Notion.Search.Alfred.5.alfredworkflow
+https://github.com/wrjlewis/notion-search-alfred5-workflow/
 
 Usual automatic updates will follow once you've updated to the Alfred 5 version of this workflow. 
 
@@ -318,11 +316,11 @@ Thanks!</string>
 	</dict>
 	<key>variablesdontexport</key>
 	<array>
-		<string>cookie</string>
 		<string>notionSpaceId</string>
+		<string>cookie</string>
 	</array>
 	<key>version</key>
-	<string>0.5.2-alfred4</string>
+	<string>0.5.3-alfred4</string>
 	<key>webaddress</key>
 	<string>https://github.com/wrjlewis/notion-search-alfred-workflow/</string>
 </dict>
