@@ -388,4 +388,3 @@ if not itemList:
 items = {}
 items["items"] = itemList
 items_json = json.dumps(items)
-sys.stdout.write(items_json)
