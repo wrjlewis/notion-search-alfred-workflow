@@ -21,9 +21,13 @@ Pressing enter on a search result takes you to that page in Notion in your defau
 
 Hold Cmd + press enter on any search result to copy the url to your clipboard. 
 
-Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates.
+**Additional features**
 
-The workflow also provides the ability to quickly see your __recently viewed pages__. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed. 
+* Comes with pre-configured support for [OneUpdater](https://github.com/vitorgalvao/alfred-workflows/tree/master/OneUpdater) for automatic version updates.
+
+* The workflow also provides the ability to quickly see your __recently viewed pages__. Simply type the 'ns' keyword to start the workflow, as you would before you search, and your most recently viewed notion pages are displayed. 
+
+* Open a new notion page by typing 'nsn', this only supports the web app currently, it's very handy!
 
 ![img](https://raw.githubusercontent.com/wrjlewis/notion-search-alfred5-workflow/main/alfred%20notion%20search.gif)
 
@@ -47,8 +51,6 @@ Many people will have Python3 already on their machine, if you haven't you can t
 
 Otherwise you can read a more detailed guide on installing Python [here](https://docs.python-guide.org/starting/install3/osx/). 
 
-
-
 ### Install cairosvg (optional)
 
 Installing cairosvg will allow svg icons to be shown in Alfred search results, providing a more visually appealing experience. Open terminal and run the following command:
@@ -59,7 +61,17 @@ Install cairosvgs's dependency, cairo. With [Homebrew](https://brew.sh/) for exa
 
 `brew install cairo`
 
-If you haven't used homebrew before, you may want to skip this optional step.
+If you haven't used homebrew before, you may want to skip this optional step or install homebrew (easy with a quick google search).
+
+UPDATE: There seems to be an issue with cairosvg on apple silicon, use this fix at your own risk but this worked for me and now SVG icons show again:
+
+```
+brew install cairo pango gdk-pixbuf libxml2 libxslt libffi
+sudo mkdir /usr/local/lib/
+sudo ln -s /opt/homebrew/lib/libcairo-2.dll /usr/local/lib/libcairo-2.dll
+sudo ln -s /opt/homebrew/lib/libcairo.so.2 /usr/local/lib/libcairo.so.2
+sudo ln -s /opt/homebrew/lib/libcairo.2.dylib /usr/local/lib/libcairo.2.dylib
+```
 
 ### Get your workflow variables
 
