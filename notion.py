@@ -341,7 +341,9 @@ else:
                     else:
                         if searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('type') == "collection_view":
                             collectionPointerId = searchResults.recordMap.get('block').get(searchResultObject.id).get('value').get('format').get('collection_pointer').get('id')
-                            searchResultObject.icon = geticonpath(searchResultObject.id, searchResults.recordMap.get('collection').get(collectionPointerId).get('value').get('icon'))
+                            iconUrl = searchResults.recordMap.get('collection').get(collectionPointerId).get('value').get('icon')
+                            if iconUrl is not None:
+                                searchResultObject.icon = geticonpath(searchResultObject.id, searchResults.recordMap.get('collection').get(collectionPointerId).get('value').get('icon'))
                 else:
                     searchResultObject.icon = None
                     searchResultObject.title = searchResultObject.title
@@ -388,3 +390,4 @@ if not itemList:
 items = {}
 items["items"] = itemList
 items_json = json.dumps(items)
+sys.stdout.write(items_json)

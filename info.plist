@@ -39,6 +39,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>F7D08518-1D55-4B69-AE6C-198FA8628A43</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>0B599F73-39AE-445B-8B09-AA12331F953D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Will Lewis</string>
@@ -234,9 +247,56 @@ fi</string>
 			<key>version</key>
 			<integer>3</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>nsn</string>
+				<key>subtext</key>
+				<string></string>
+				<key>text</key>
+				<string>Open a new Notion page..</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>F7D08518-1D55-4B69-AE6C-198FA8628A43</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>https://notion.new</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>0B599F73-39AE-445B-8B09-AA12331F953D</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
-	<string>****** PLEASE NOTE ******
+	<string>Latest updates in 0.6:
+
+- Updated cairosvg installation instructions in the readme: run the provided commands in order to get svg icons working on apple silicon.
+- Type ‘nsn’ for the option to quickly open a new page in Notion. Very handy! (This only works in the web app currently)
+- https://github.com/wrjlewis/notion-search-alfred-workflow/issues/83 - Fixed a bug that would cause an error and no more results to be displayed when opening pages relating to new Notion projects and icons.
+
+
+****** PLEASE NOTE ******
 
 Alfred 5 download now available here:
 
@@ -246,9 +306,7 @@ Usual automatic updates will follow once you've updated to the Alfred 5 version 
 
 If you are on alfred 4, you do not need to do anything and updates will continue as usual. 
 
-
-****** PLEASE NOTE ******
-
+---
 
 notion-search-alfred-workflow
 An Alfred workflow to search Notion.so with instant results
@@ -264,6 +322,13 @@ https://www.alfredforum.com/topic/14451-notionso-instant-search-workflow/
 Thanks!</string>
 	<key>uidata</key>
 	<dict>
+		<key>0B599F73-39AE-445B-8B09-AA12331F953D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>255</integer>
+			<key>ypos</key>
+			<integer>480</integer>
+		</dict>
 		<key>2A617635-BC53-4025-A598-0A8B1E6C434B</key>
 		<dict>
 			<key>xpos</key>
@@ -288,6 +353,13 @@ Thanks!</string>
 			<real>255</real>
 			<key>ypos</key>
 			<real>175</real>
+		</dict>
+		<key>F7D08518-1D55-4B69-AE6C-198FA8628A43</key>
+		<dict>
+			<key>xpos</key>
+			<integer>65</integer>
+			<key>ypos</key>
+			<integer>480</integer>
 		</dict>
 		<key>FCE03E9D-F992-4B21-9A77-E72D5130DF80</key>
 		<dict>
@@ -316,11 +388,11 @@ Thanks!</string>
 	</dict>
 	<key>variablesdontexport</key>
 	<array>
-		<string>notionSpaceId</string>
 		<string>cookie</string>
+		<string>notionSpaceId</string>
 	</array>
 	<key>version</key>
-	<string>0.5.3-alfred4</string>
+	<string>0.6-alfred4</string>
 	<key>webaddress</key>
 	<string>https://github.com/wrjlewis/notion-search-alfred-workflow/</string>
 </dict>
