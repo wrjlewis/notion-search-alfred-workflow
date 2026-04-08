@@ -3,6 +3,8 @@ An Alfred workflow to search Notion.so with instant results
 
 ![img](https://raw.githubusercontent.com/wrjlewis/notion-search-alfred-workflow/master/Screenshot.png)
 
+ℹ️ I highly recommend using the Alfred 5 version of this workflow, as found below. The Alfred4 version has not been updated with the latest bug fixes and will not receive these updates in future.
+
 **Alfred 5 version**
 
 [Github Repository](https://github.com/wrjlewis/notion-search-alfred5-workflow)
@@ -10,6 +12,8 @@ An Alfred workflow to search Notion.so with instant results
 [Latest Download](https://github.com/wrjlewis/notion-search-alfred5-workflow/releases/latest/download/Notion.Search.alfredworkflow)
 
 **Alfred 4 version**
+
+⚠️ The Alfred 4 version will not receive further updates.
 
 [Github Repository](https://github.com/wrjlewis/notion-search-alfred-workflow)
 
